@@ -492,6 +492,4 @@ def main():
     app = MusicWindow(root)
     root.protocol("WM_DELETE_WINDOW", lambda: (app.stop_sound(), root.destroy()))
     root.mainloop()
-
-if __name__ == "__main__":
-    main()
+main()
