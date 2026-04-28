@@ -184,16 +184,7 @@ class MusicWindow:
         self.visualization.grid(row=1, column=0, sticky="ew", pady=(0, 22))
         self.visualization.bind("<Configure>", lambda _event: self.draw_stuff())
 
-        self.log = tk.Text(
-            body,
-            bg=self.panel_color,
-            fg=self.text_color,
-            font=("Courier New", 11),
-            height=12,
-            wrap="none",
-            relief="solid",
-            borderwidth=1,
-        )
+        self.log = tk.Text(body, bg=self.panel_color, fg=self.text_color, font=("Courier New", 11), height=12, wrap="none", relief="solid", borderwidth=1)
         self.log.grid(row=2, column=0, sticky="nsew")
         self.log.configure(state="disabled")
 
@@ -281,10 +272,7 @@ class MusicWindow:
                 self.audio_process = subprocess.Popen(audio_command, stdout=devnull, stderr=devnull)
         else:
             self.status.set("Audio playback unavailable")
-            self.put_words([
-                "WAV playback is not available on this system.",
-                "Windows uses winsound. macOS needs afplay.",
-            ])
+            self.put_words(["WAV playback is not available on this system.", "Windows uses winsound. macOS needs afplay.",])
             return
 
         self.play_started_at = time.monotonic()
