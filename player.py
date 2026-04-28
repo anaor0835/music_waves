@@ -35,7 +35,7 @@ def create_wav_file(midi_name, wav_name):
     audio = midi_data.synthesize(fs=44100)
 
     wav = wave.open(wav_name, "w")
-    # write wav
+
     wav.setnchannels(1)
     wav.setsampwidth(2)
     wav.setframerate(44100)
