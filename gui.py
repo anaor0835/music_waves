@@ -49,7 +49,7 @@ class MusicWindow:
     def __init__(self, root):
         self.root = root
         self.root.title("Music Waves")
-self.root.minsize(1020, 780)
+        self.root.minsize(1020, 780)
 
         self.csv_path = tk.StringVar(value=default_csv)
         self.midi_path = tk.StringVar(value=default_midi)
@@ -82,18 +82,7 @@ self.root.minsize(1020, 780)
 )
 
     def make_button(self, parent, text, command, background):
-        button = tk.Button(
-            parent,
-            text=text,
-            command=command,
-            bg=background,
-            fg="white",
-            activebackground=background,
-            activeforeground="white",
-            font=("Arial", 13),
-            relief="flat",
-            cursor="hand2",
-        )
+        button = tk.Button(parent,text=text,command=command,bg=background,fg="black",activebackground=background,activeforeground="black",font=("Arial", 13),relief="flat",cursor="hand2")
         return button
 
     def make_screen(self):
@@ -164,7 +153,7 @@ self.root.minsize(1020, 780)
         buttons.grid(row=0, column=0, sticky="ew", pady=(0, 12))
         buttons.columnconfigure((0, 1), weight=1, uniform="buttons")
 
-        generate_button = self.make_button(buttons, "Generate Music Files", self.make_files, self.generate_color)
+        generate_button = self.make_button(buttons, "Generate Music", self.make_files, self.generate_color)
         generate_button.grid(row=0, column=0, sticky="ew", padx=(0, 8), ipady=9)
 
         help_button = self.make_button(buttons, "Help", self.help_text, self.help_color)
