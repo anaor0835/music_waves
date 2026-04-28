@@ -59,6 +59,4 @@ def main():
     print(f"MIDI file saved to {out}")
     print(f"WAV file saved to {wav_out}")
 
-
-if __name__ == "__main__":
-    main()
+main()
