@@ -46,7 +46,7 @@ def get_audio_command(wav_path):
 
 
 class MusicWindow:
-    def __init__(self, root):
+    def setup(self, root):
         self.root = root
         self.root.title("Music Waves")
         self.root.minsize(1020, 780)
@@ -79,10 +79,19 @@ class MusicWindow:
         self.make_screen()
         self.root.after(120, self.keep_playing)
 
-)
-
     def make_button(self, parent, text, command, background):
-        button = tk.Button(parent,text=text,command=command,bg=background,fg="black",activebackground=background,activeforeground="black",font=("Arial", 13),relief="flat",cursor="hand2")
+        button = tk.Button(
+            parent,
+            text=text,
+            command=command,
+            bg=background,
+            fg="black",
+            activebackground=background,
+            activeforeground="black",
+            font=("Arial", 13),
+            relief="flat",
+            cursor="hand2",
+        )
         return button
 
     def make_screen(self):
@@ -97,7 +106,7 @@ class MusicWindow:
 
         title = tk.Label(
             header,
-            text="Brainwave To Music",
+            text="Music Waves",
             bg=self.header_color,
             fg="white",
             font=("Arial", 28, "bold"),
@@ -193,58 +202,54 @@ class MusicWindow:
         self.log.delete("1.0", END)
         self.log.insert(END, "\n".join(lines))
         self.log.configure(state="disabled")
-    
+
     def make_files(self):
-        try:
-            csv_path = self.csv_path.get().strip()
-            midi_path = self.midi_path.get().strip()
-            wav_path = make_wav_name(midi_path)
+        csv_path = self.csv_path.get().strip()
+        midi_path = self.midi_path.get().strip()
+        wav_path = make_wav_name(midi_path)
 
-            data = load_brainwave_data(csv_path)
-            notes = turn_data_into_notes(data)
+        data = load_brainwave_data(csv_path)
+        notes = turn_data_into_notes(data)
 
-            if not notes:
-                self.current_data = []
-                self.current_notes = []
-                self.brainwave_summary = {}
-                self.status.set("The file had no data")
-                self.put_words(["The file had no data."])
-                self.draw_stuff()
-                return
-
-            self.stop_sound()
-            create_midi_file(notes, midi_path)
-            create_wav_file(midi_path, wav_path)
-
-            self.current_data = data
-            self.current_notes = notes
-            self.brainwave_summary = average_waves(data)
-
-            total_duration = 0
-            for note in notes:
-                total_duration += note["duration"]
-            self.play_duration = total_duration
-
-            lines = []
-            lines.append("Saved MIDI file:")
-            lines.append(midi_path)
-            lines.append("")
-            lines.append("Saved WAV file:")
-            lines.append(wav_path)
-            lines.append("")
-
-            index = 1
-            for note in notes:
-                 line = "note %s | pitch %s | tempo %s | duration %.2f | velocity %s" % (index, note["pitch"], note["tempo"], note["duration"], note["velocity"])
-                 lines.append(line)
-                 index += 1
-
-            self.status.set("Saved MIDI and WAV files")
-            self.put_words(lines)
+        if not notes:
+            self.current_data = []
+            self.current_notes = []
+            self.brainwave_summary = {}
+            self.status.set("The file had no data")
+            self.put_words(["The file had no data."])
             self.draw_stuff()
-        except Exception as err:
-            self.status.set("Could not make files")
-            self.put_words([str(err)])
+            return
+
+        self.stop_sound()
+        create_midi_file(notes, midi_path)
+        create_wav_file(midi_path, wav_path)
+
+        self.current_data = data
+        self.current_notes = notes
+        self.brainwave_summary = average_waves(data)
+
+        total_duration = 0
+        for note in notes:
+            total_duration += note["duration"]
+        self.play_duration = total_duration
+
+        lines = []
+        lines.append("Saved MIDI file:")
+        lines.append(midi_path)
+        lines.append("")
+        lines.append("Saved WAV file:")
+        lines.append(wav_path)
+        lines.append("")
+
+        index = 1
+        for note in notes:
+            line = "note %s | pitch %s | tempo %s | duration %.2f | velocity %s" % (index, note["pitch"], note["tempo"], note["duration"], note["velocity"])
+            lines.append(line)
+            index += 1
+
+        self.status.set("Saved MIDI and WAV files")
+        self.put_words(lines)
+        self.draw_stuff()
 
     def help_text(self):
         self.status.set("Showing help")
@@ -252,7 +257,7 @@ class MusicWindow:
         lines.append("How to use:")
         lines.append("1. Type the CSV file path in the top box.")
         lines.append("2. Type where the MIDI should save in the second box.")
-        lines.append("3. Press Generate Music Files.")
+        lines.append("3. Press Generate Music.")
         lines.append("4. The WAV file will save next to the MIDI file.")
         lines.append("")
         lines.append("Default CSV file already points to data.csv in this folder.")
@@ -266,46 +271,36 @@ class MusicWindow:
             self.put_words(["Generate music first so the WAV file exists.", wav_path])
             return
 
-        try:
-            self.stop_sound(update_status=False)
-            audio_command = get_audio_command(wav_path)
+        self.stop_sound(update_status=False)
+        audio_command = get_audio_command(wav_path)
 
-            if winsound is not None:
-                winsound.PlaySound(wav_path, winsound.SND_FILENAME | winsound.SND_ASYNC)
-            elif audio_command:
-                with open(os.devnull, "wb") as devnull:
-                    self.audio_process = subprocess.Popen(audio_command, stdout=devnull, stderr=devnull)
-            else:
-                self.status.set("Audio playback unavailable")
-                self.put_words([
-                    "WAV playback is not available on this system.",
-                    "Windows uses winsound. macOS needs afplay.",
-                ])
-                return
+        if winsound is not None:
+            winsound.PlaySound(wav_path, winsound.SND_FILENAME | winsound.SND_ASYNC)
+        elif audio_command:
+            with open(os.devnull, "wb") as devnull:
+                self.audio_process = subprocess.Popen(audio_command, stdout=devnull, stderr=devnull)
+        else:
+            self.status.set("Audio playback unavailable")
+            self.put_words([
+                "WAV playback is not available on this system.",
+                "Windows uses winsound. macOS needs afplay.",
+            ])
+            return
 
-            self.play_started_at = time.monotonic()
-            if self.current_notes:
-                total = 0
-                for note in self.current_notes:
-                    total += note["duration"]
-                self.play_duration = total
-            self.status.set("Playing WAV file")
-        except (OSError, RuntimeError) as err:
-            self.play_started_at = None
-            self.audio_process = None
-            self.status.set("Could not play WAV file")
-            self.put_words([str(err)])
+        self.play_started_at = time.monotonic()
+        if self.current_notes:
+            total = 0
+            for note in self.current_notes:
+                total += note["duration"]
+            self.play_duration = total
+        self.status.set("Playing WAV file")
 
     def stop_sound(self, update_status=True):
         if winsound is not None:
             winsound.PlaySound(None, winsound.SND_PURGE)
         elif self.audio_process is not None:
             self.audio_process.terminate()
-            try:
-                self.audio_process.wait(timeout=1)
-            except subprocess.TimeoutExpired:
-                self.audio_process.kill()
-                self.audio_process.wait(timeout=1)
+            self.audio_process.wait()
             self.audio_process = None
         self.play_started_at = None
         self.draw_stuff()
@@ -466,17 +461,9 @@ class MusicWindow:
 
 def main():
     root = tk.Tk()
-    app = MusicWindow(root)
+    app = MusicWindow()
+    app.setup(root)
     root.protocol("WM_DELETE_WINDOW", lambda: (app.stop_sound(), root.destroy()))
     root.mainloop()
 
 main()
-
-
-
-
-
-    
-
-
-            
