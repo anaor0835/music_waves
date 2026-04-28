@@ -6,3 +6,4 @@ StringVar - this is a tkinter variable type that automatically updates the inter
 MIDI and WAV - the very base of my project:
 A MIDI file contains a set of instructions for audio. For example, it tells to play a specific note at a specific volume for a specific number of seconds.
 WAV file contains real recorded audio aka actual sound waves saved as numbers. WAV files are uncompressed, meaning the audio is stored at full quality. This makes them larger in size, but the sound is better.
+try - an error tracker basically. Removing it would crash the program on Mac (which I'm currently using) where winsound (audio playback for Windows) doesn't exist.
